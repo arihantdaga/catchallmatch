@@ -1,8 +1,8 @@
-
-
 const rp = require("request-promise");
 const async = require("async");
 const _ = require("lodash");
+
+const THRESHOLD_SCORE = 30;
 
 
 const APIs = {
@@ -35,7 +35,7 @@ function getProfiles(auth_token){
         .then(function (data) {
             // console.log(data);
             if(data && data.results){
-                console.log(`Got ${data.results.length} Profiles`);
+                // console.log(`Got ${data.results.length} Profiles`);
             }
             return data;
         });
@@ -55,6 +55,7 @@ function passProfile(auth_token, id){
         });
 }
 function likeProfile(auth_token, id){
+    // console.log("Liking : ", id);
     let options = {
         uri: APIs.pass.replace("{:id}", id),
         headers:get_headers(auth_token),
@@ -63,7 +64,7 @@ function likeProfile(auth_token, id){
     
     return rp(options)
         .then(function (data) {
-            console.log(data);
+            // console.log(data);
             return data;
         });
 }
@@ -197,9 +198,105 @@ function getAge(dob){
 }
 
 
+function fetch_profiles_and_match(auth_token,prefrences, count){
+    return new Promise((resolve,reject)=>{
 
+        let likedProfiles = 0;
+        let fetchedProfiles = 0;
+        getProfiles(auth_token).then(data=>{
+            if(data && data.results){
+                let new_profiles = _.cloneDeep(data.results);
+                fetchedProfiles += new_profiles.length;
+                // console.log("Fetched Profiles : ", fetchedProfiles);
+                counter = 0;
+                profile_processes = new_profiles.map(profile => async.reflect(function(callback){
+                    filterProfile(profile,prefrences).then(scoreData=>{
+                        if(scoreData && scoreData.score && scoreData.score > THRESHOLD_SCORE){
+                            console.log("Score : ",scoreData.score);
+                            setTimeout(function(){
+                                likeProfile(auth_token,scoreData.profile.user._id).then(data=>{
+                                    likedProfiles++;
+                                    // console.log("Liked Profiles : ", likedProfiles);
+                                    callback(null,scoreData.profile.user._id);
+                                }).catch(err=>{
+                                    callback(err);
+                                });
+                            }, 1000* counter);
+                            counter++;
+                            
+                    }else{
+                            // console.log("Profile Rejected");
+                            // console.log(scoreData);
+                            if(scoreData){
+                                // console.log(scoreData.score);
+                            }
+                            callback("Profile Rejected");
+                        }
+                    }).catch(err=>{
+                        callback(err);
+                    })
+                }));
 
-function test_action(auth_token, prefrences){
+                // console.log(profile_processes);
+                async.series(profile_processes, function(err,res){
+                    if(err){
+                        console.log("Error Occured in fetching profiles");
+                        console.log(err);
+                    }
+                    // console.log(res);
+                    // console.log("Done");
+                    // console.log("Total Profiles fetched : ", fetchedProfiles);
+                    // console.log("Total Profiles liked : ", likedProfiles);
+                    return resolve({fetchedProfiles,likedProfiles, res});
+                });
+            }else{
+                // Error in APIs, Block Operation her. 
+                // Most probably its resource timeout error from Tinder API,
+                // We need new token now.
+                return reject(Error("Token Blocked, Relogin and update the token"));
+            }
+            
+        });
+    });
+    
+}
+
+function swipeFinger(auth_token, prefrences, limit){
+    let fetchedProfiles = 0;
+    let likedProfiles = 0;
+    let results = [];
+    function recursive(){
+        fetch_profiles_and_match(auth_token,prefrences).then(data=>{
+            if(data.hasOwnProperty("fetchedProfiles")) {
+                fetchedProfiles += data.fetchedProfiles;
+                likedProfiles += data.likedProfiles;
+                results.push(_.clone(data.res));
+    
+                console.log("Fetched Profiles : ", fetchedProfiles);
+                console.log("Liked Profiles : ", likedProfiles);
+                if(fetchedProfiles < limit){
+                    recursive();
+                }else{
+                    return;
+                }
+                
+            }else{
+                // Something went wrong, and we dont have data.
+                // Abort the program here.
+                console.log("Unknown Exception occured. Terminating program here");
+                return;
+            }
+        }).catch(err=>{
+            console.log("An error occured, Terminating program here");
+            console.log(err);
+        });
+    }
+    recursive();
+}
+
+module.exports = { swipeFinger }
+
+/* function test_action(auth_token, prefrences){
     let scores = [];
     let n_times = 5;
     let profile_requests = [];
@@ -251,21 +348,12 @@ function test_action(auth_token, prefrences){
     });
 
 }
+ */
 
-
-const auth_token = "f7e0f062-9c57-4bec-8bc7-c84cbd5a9718";
-const pref_options = {
-    bio_required : true,
-    age_range:{
-        lower: 18,
-        higher: 25
-    },
-    distance_range:{
-        max: 5
-    }
-}
 // With Prefrence Options
 // test_action(auth_token, pref_options);
 
 // I am fine with everything, I dont discriminate
-test_action(auth_token, {});
+// test_action(auth_token, {});
+
+// fetch_profiles_and_match(auth_token,pref_options);

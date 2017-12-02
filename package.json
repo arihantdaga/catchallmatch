@@ -4,6 +4,8 @@
   },
   "dependencies": {
     "async": "^2.6.0",
+    "color-it": "^1.2.10",
+    "emojic": "^1.1.12",
     "lodash": "^4.17.4",
     "request": "^2.83.0",
     "request-promise": "^4.2.2"
