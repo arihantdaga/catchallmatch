@@ -256,7 +256,9 @@ function fetch_profiles_and_match(auth_token,prefrences, count){
                 return reject(Error("Token Blocked, Relogin and update the token"));
             }
             
-        });
+        }).catch(err=>{
+            return reject(err);
+        })
     });
     
 }
@@ -288,7 +290,7 @@ function swipeFinger(auth_token, prefrences, limit){
             }
         }).catch(err=>{
             console.log("An error occured, Terminating program here");
-            console.log(err);
+            console.log(err.message);
         });
     }
     recursive();
