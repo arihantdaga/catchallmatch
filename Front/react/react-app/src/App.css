@@ -1,0 +1,80 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  animation: App-logo-spin infinite 20s linear;
+  height: 80px;
+}
+
+.App-header {
+  background-color: #222;
+  height: 150px;
+  padding: 20px;
+  color: white;
+}
+
+.App-title {
+  font-size: 1.5em;
+}
+
+.App-intro {
+  font-size: large;
+}
+
+.prefrence-form-wrap{
+    width: 100%;
+    max-width: 500px;
+    margin: 20px auto;
+    padding: 30px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-shadow: 10px 10px 0px 4px rgba(252, 98, 98, 0.1);
+    text-align:left;
+}
+.prefrence-form-wrap label{
+    display: block;
+    text-align: left;
+}
+
+.formGroup{
+  padding:10px 0px;
+}
+.formGroup input[type=text]{
+    width: 100%;
+    /* height: 35px; */
+    line-height: 35px;
+    padding-left: 5px;
+    border: 2px dashed #ddd;
+    /* -webkit-appearance: none; */
+    border-radius: 2px;
+    margin-top: 5px;
+    font-size: 14px;
+    -webkit-appearance: none;
+    transition: all 0.2s ease-in;
+}
+.formGroup input[type=text]:focus{
+  -webkit-appearance: none;
+  outline: none;
+  border-color: pink;
+  transition: all 0.2s ease-in;
+  border: 2px solid pink;
+
+}
+.actionButton{
+  margin: 0px calc(50% - 60px);
+    width: 120px;
+    height: 50px;
+    -webkit-appearance: none;
+    background: pink;
+    border: 1px solid #faadbb;
+    border-radius: 3px;
+    font-size: 15px;
+    font-weight: bold;
+    box-shadow: 3px 3px 0px 2px rgba(67, 66, 66, 0.1);
+    margin-top:30px;
+}
+@keyframes App-logo-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}

@@ -1,12 +1,5 @@
 {
     "terminal.integrated.env.osx": {
         "PATH": "/Users/iamnostar/.platformio/penv/bin:/Library/Frameworks/Python.framework/Versions/2.7/bin:/Users/iamnostar/miniconda3/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Users/iamnostar/Library/Android/sdk/tools:/Users/iamnostar/Library/Android/sdk/platform-tools"
-    },
-    "files.exclude": {
-        "**/.git": true,
-        "**/.svn": true,
-        "**/.hg": true,
-        "**/CVS": true,
-        "**/.DS_Store": true
     }
 }
